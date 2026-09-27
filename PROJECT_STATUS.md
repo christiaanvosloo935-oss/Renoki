@@ -1,45 +1,35 @@
 # Renoki — Project Status
 
-_Last updated: 27 Sep 2026 (Stage 2 draft)_
+_Last updated: 27 Sep 2026 (Stage 3 draft)_
 
-## Current stage: 2 — Auth + profiles (draft complete)
+## Current stage: 3 — Create entries + image upload (draft complete)
 
 ## Completed
-### Stage 1 — Architecture & setup
-- Working dir `~/Claude/Renoki-clean`; git initialised on `main`.
-- Stage 1 schema & storage migrations in `supabase/migrations/`.
-- 57/57 RLS tests in `supabase/tests/`.
-- App shell: React + TS + Vite + Tailwind, mobile-first bottom nav (Discover / Search / Create / Saved / Profile).
-- "Reading Room" design system: cream paper, ink text, Newsreader serif, terracotta accents.
-- Supabase client + env (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
-- Auth (email/password), `AuthProvider`, `ProtectedRoute`.
-- Discover feed reads real `entries` + `entry_images`.
-
-### Stage 2 — Auth polish + profiles
-- Profile page shows any user (`/u/:username`), edit-mode gated to the owner.
-- Editable fields: username (with regex + uniqueness check), display name, bio, avatar.
-- Avatar upload: client-side WebP resize (max 512px), 2MB cap, uploaded to `avatars/<uid>/...`.
-- Sign-out available from profile.
-- Helpers: `src/lib/image.ts` (resize/strip-EXIF), `src/lib/storage.ts` (public URLs).
+### Stage 1 — Architecture & setup ✓
+### Stage 2 — Auth polish + profiles ✓
+### Stage 3 — Create entry + image upload
+- `Create.tsx` published: title, body, source URL (http(s) only), category, up to 8 tags, up to 6 images.
+- Client-side WebP resize for every image: `display` ≤ 1600px, `thumb` ≤ 640px. EXIF stripped via canvas re-encode.
+- Uploads land under `entry-images/<uid>/<entry-id>/<i>-{display|thumb}.webp`.
+- Alt text required on every image (accessibility).
+- Tags go through the `set_entry_tags` RPC (server enforces max 8 + creates missing tag rows).
 
 ## In progress
-- Push to GitHub (needs the empty repo URL from you).
-- Applying migrations to the Supabase project (needs project URL + anon key + SQL editor).
+- User to supply Supabase project URL + anon key so `.env` can be filled.
+- User to run the two migrations in Supabase SQL Editor.
+- Once above two are done: end-to-end test of Create → Discover → EntryDetail.
 
 ## Next steps
-1. Empty GitHub repo → paste URL → I walk you through `git push`.
-2. `.env` filled with your Supabase URL + anon key → run both migration files in SQL Editor in order.
-3. Stage 3: Create entry + client-side image resize + preview.
+1. Live Supabase → I fill `.env` and verify the app boots against it.
+2. Stage 4: Discover feed polish (infinite scroll, lazy images, fixed aspect ratios) + EntryDetail polish (image carousel, source-link chip).
+3. Stage 5: Edit/delete own entries with storage cleanup.
+4. Stage 6: Likes / comments / saves (optimistic UI).
+5. Stage 7: Search + categories + tags pages.
+6. Stage 8: Responsive + a11y polish.
+7. Stage 9: Security review.
+8. Stage 10: Deploy to Vercel.
 
 ## Known issues / risks
-- Discover feed will show a "couldn't reach Supabase" hint until `.env` is real and migrations applied.
-- Original `~/Claude/Renoki` folder retained but has neutralised stubs from an earlier delete attempt (host perms). Ignore it — canonical work is `~/Claude/Renoki-clean`.
-- Vercel Hobby is non-commercial only.
-
-## Key decisions
-| Decision | Reason |
-|---|---|
-| Avatar resize client-side to WebP, 512px max | Supabase image transforms are paid |
-| Username regex `^[a-z0-9_]{3,24}$` | Predictable URLs, no unicode footguns |
-| Upsert avatar under `<uid>/avatar-<ts>.webp` | Human-readable, no orphans if user re-uploads |
-| Public buckets, client builds URL | Free, avoids signed-URL round-trips |
+- Auth confirm-email flow depends on Supabase email settings — user may need to disable email confirmation in Supabase → Auth → Providers for painless local testing.
+- Deleted entries' storage files aren't cleaned up yet (Stage 5).
+- No rate-limiting on Create (per free tier, mitigated by RLS + reasonable client throttling later).

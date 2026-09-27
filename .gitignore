@@ -10,3 +10,4 @@ dist/
 vite.config.d.ts
 vite.config.js
 vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
