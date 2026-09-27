@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+body {
+  @apply bg-paper text-ink font-sans antialiased;
+  font-feature-settings: 'ss01', 'ss02', 'kern';
+}
+
+h1, h2, h3, h4 {
+  @apply font-display text-ink;
+  font-optical-sizing: auto;
+  letter-spacing: -0.005em;
+}
+
+/* pretty text selection */
+::selection {
+  background-color: theme('colors.gold.soft');
+  color: theme('colors.ink');
+}
+
+/* Safe area padding for iOS bottom nav */
+.pb-safe { padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px); }
+
+/* Prevent iOS input zoom by keeping >=16px font-size on inputs */
+input, textarea, select { font-size: 16px; }
